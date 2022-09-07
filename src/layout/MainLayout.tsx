@@ -38,7 +38,11 @@ export const MainLayout = () => {
 
     return (
         <AppWrapper>
-            <Header/>
+            <Header
+                sidebarIsOpen={sidebarIsOpen}
+                handleSidebarOpen={handleSidebarOpen}
+                handleSidebarClose={handleSidebarClose}
+            />
             <Content></Content>
             <Footer></Footer>
         </AppWrapper>
