@@ -1,0 +1,41 @@
+.header {
+  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  position: fixed;
+  background-color: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+  .main-links {
+    ul {
+      li {
+        display: inline;
+        padding: 0 10px;
+
+        a {
+          color: #979797;
+          text-decoration: none;
+          position: relative;
+
+          &.is-active {
+            color: #000000;
+
+            &:after {
+              position: absolute;
+              content: '';
+              height: 2px;
+              bottom: -7px;
+              margin: 0 auto;
+              left: 0;
+              right: 0;
+              width: 50%;
+              background-color: black;
+            }
+          }
+        }
+      }
+    }
+  }
+}
