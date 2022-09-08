@@ -1,5 +1,6 @@
 import {createSlice} from "@reduxjs/toolkit";
 
+// Not usable, using this state globally cause some problems i cant solve :)
 const sidebarSlice = createSlice({
     name: 'sidebarOpenStatus',
     initialState: {
