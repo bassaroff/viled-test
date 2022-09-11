@@ -70,6 +70,44 @@ ul {
   height: 100%;
 }
 
+.checkbox__wrapper {
+  padding: 10px 0;
+
+  .checkbox {
+    display: none;
+
+    &:checked + .checkbox__before::before {
+      opacity: 1;
+    }
+  }
+
+  .checkbox__before {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #000000;
+    border-radius: 2px;
+    margin-right: 12px;
+    position: relative;
+
+    &::before {
+      content: url("/src/assets/images/check-icon.png");
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 9px;
+      height: 9px;
+      opacity: 0;
+      transition: 0.5s;
+    }
+  }
+
+  .checkbox__text {
+    font-size: 16px;
+    line-height: 21px;
+  }
+}
+
 @media screen and (max-width: 1200px) {
   .col-lg-1 {width: 8.33%;}
   .col-lg-2 {width: 16.66%;}

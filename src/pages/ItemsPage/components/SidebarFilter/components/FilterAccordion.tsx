@@ -1,41 +1,80 @@
 import {useState} from "react";
+import {v4 as uuid} from 'uuid';
 import ArrowDown from "../../../../../assets/images/arrow-down-icon.svg";
-import {filter as SidebarFilterData} from "../../../../../mock/data";
+import {FilterItem} from "../../../models/FilterItems";
+import {Checkbox} from "antd";
 
-const Filter = (props) => {
+const SearchInput = (props: {
+    setSearch: (value: string) => void
+}) => {
+    const {setSearch} = props;
+
     return (
         <div className='filter__wrapper'>
-            <input type='text' placeholder='Поиск бренда'/>
+            <input type='text' placeholder='Поиск' onChange={(event => {
+                setSearch(event.target.value);
+            })}/>
         </div>
     )
 }
 
 export const FilterAccordion = (props: {
-    items: {}[],
-    changeFilter: (id: number) => void
+    toggleAccordion: () => void
+    index: number,
+    activeAccordion: number,
+    headerTitle: string,
+    items: FilterItem[],
+    selectedItems: FilterItem[],
+    toggleItem: (item: FilterItem) => void
 }) => {
-    const [isOpen, toggleIsOpen] = useState(false);
-    const {items, changeFilter} = props;
+    const {
+        items,
+        toggleItem,
+        headerTitle,
+        selectedItems,
+        toggleAccordion,
+        activeAccordion,
+        index
+    } = props;
+    const [search, setSearch] = useState('');
+
+    const isItemChecked = (item: FilterItem): boolean => {
+        return selectedItems.includes(item);
+    }
+
     return (
         <div className='accordion'>
-            <div className='accordion-header' onClick={() => {
-                toggleIsOpen(!isOpen);
-            }}>
+            <div className='accordion-header' onClick={toggleAccordion}>
                 <p className='accordion-header__title'>
-                    Группа
+                    {headerTitle}
                 </p>
-                <img className={`${isOpen && 'transformed'}`} src={ArrowDown} alt={'arrow-down'}/>
+                <img className={`${activeAccordion === index && 'transformed'}`} src={ArrowDown} alt={'arrow-down'}/>
             </div>
-            <div className={`accordion-body ${isOpen && 'is-open'}`}>
-                <Filter/>
-                {SidebarFilterData.brands.map((item) => {
-                    return (
-                        <div>
-                            <input type="checkbox" checked={true} />
-                            <label >Subscribe to newsletter?</label>
-                        </div>
-                    );
-                })}
+            <div className={`accordion-body ${activeAccordion === index && 'is-open'}`}>
+                <SearchInput setSearch={(value) => setSearch(value)}/>
+                {
+                    items.map((item) => {
+                        if (item.name.toLowerCase().includes(search.toLowerCase())) {
+                            const id = uuid();
+                            return (
+                                <div className='checkbox__wrapper' key={id}>
+                                    <input
+                                        className='checkbox'
+                                        type="checkbox"
+                                        checked={isItemChecked(item)}
+                                        onChange={() => {
+                                            console.log('he')
+                                            toggleItem(item)
+                                        }}
+                                        id={id}
+                                    />
+                                    <span className='checkbox__before'></span>
+                                    <label className='checkbox__text' htmlFor={id}>{item.name}</label>
+                                </div>
+                            )
+                        }
+                    })
+                }
             </div>
         </div>
     );

@@ -1,23 +1,22 @@
-import './sidebar.scss'
-import {useEffect, useState} from "react";
-import ArrowDown from '../../../../assets/images/arrow-down-icon.svg';
-import {Checkbox, FormControlLabel} from "@mui/material";
-import {filter as SidebarFilterData} from "../../../../mock/data";
+import {v4 as uuid} from 'uuid';
 import {FilterAccordion} from "./components/FilterAccordion";
+import {FilterItem, FilterItems} from "../../models/FilterItems";
+import {SelectedFilters} from "./components/SelectedFilters";
+import './sidebar.scss'
+import {Brands, Colors, Types} from "../../../../mock/data";
+import {useEffect, useState} from "react";
+import {getSelectedFilterItemWithToggleAction} from "../../../../services/getSelectedFilterItemWithToggleAction";
 
 export const SideBarFilter = (props: {
     mobIsOpen: boolean,
-    filter: any,
-    setFilter: (data: any) => void
+    filter: FilterItems,
+    setFilter: (data: FilterItems) => void,
+    clearFilter: () => void,
 }) => {
 
-    const [selectedFilterItems, setSelectedFilterItems] = useState([]);
-
-    const {mobIsOpen} = props;
-
-    const handleFilterChange = () => {
-
-    }
+    const {mobIsOpen, clearFilter, filter, setFilter} = props;
+    const [activeAccordion, setActiveAccordion] = useState(-1);
+    const [selectedCategories, setSelectedCategories] = useState([])
 
     const AccordionsWrapper = (props) => {
         return (
@@ -27,51 +26,97 @@ export const SideBarFilter = (props: {
         )
     }
 
-    const handleChangeCategory = (id: number) => {
-
+    const toggleAccordion = (index: number): void => {
+        if(index === activeAccordion) {
+            setActiveAccordion(-1);
+        } else {
+            setActiveAccordion(index);
+        }
     }
-    const handleChangeBrand = (id: number) => {
-
+    
+    const toggleBrand = (brand: FilterItem) => {
+        if(!filter.brands.includes(brand)) {
+            filter.brands.push(brand);
+        } else {
+            filter.brands = filter.brands.filter((item) => item.id !== brand.id);
+        }
+        setFilter({...filter})
     }
-    const handleChangeColor = (id: number) => {
 
+    const toggleType = (type: FilterItem) => {
+        if(!filter.types.includes(type)) {
+            filter.types.push(type);
+        } else {
+            filter.types = filter.types.filter((item) => item.id !== type.id);
+        }
+        setFilter({...filter})
     }
+
+    const toggleColor = (color: FilterItem) => {
+        if(!filter.colors.includes(color)) {
+            filter.colors.push(color);
+        } else {
+            filter.colors = filter.colors.filter((item) => item.id !== color.id);
+        }
+        setFilter({...filter})
+    }
+
+    useEffect(()=> {
+        const categories = [];
+        filter.brands.map((item) => {
+            item.toggleItem = () =>  toggleBrand(item);
+            categories.push(item);
+        });
+        filter.types.map((item) => {
+            item.toggleItem = () => toggleType(item);
+            categories.push(item);
+        });
+        filter.colors.map((item) => {
+            item.toggleItem = () => toggleColor(item);
+            categories.push(item);
+        });
+
+        setSelectedCategories([...categories]);
+    },[filter])
 
     return (
         <div className={`col-3 sidebar__wrapper ${mobIsOpen && 'mobile-open'}`} style={{
-            borderRight: '1px solid rgba(0, 0, 0, 0.05)',
-            padding: '0.75rem 0'
+            padding: '0 0',
         }}>
             <div>
-                <div className='selected-filter__wrapper'>
-                    <div className='d-flex justify-space-between align-items-center'>
-                        <p className='selected-filter__header-title'>Выбранные фильтра</p>
-                        <button type='button' className='selected-filter__header-btn'>Сбросить</button>
-                    </div>
-                    <div className='selected-filter__items'>
-                        {!selectedFilterItems.length && (
-                            <p>No filter</p>
-                        )}
-                        {selectedFilterItems.map((item, index) => {
-                            return (
-                                <div className='selected-filter__item' key={`filter-item${index}`}>
-                                    <p>{item.label}</p>
-                                    <button type='button'>
-                                        x
-                                    </button>
-                                </div>
-                            )
-                        })}
-                    </div>
-                </div>
+                <SelectedFilters
+                    selectedItems={selectedCategories}
+                    clearFilter={clearFilter}
+                    filter={filter}
+                />
                 <AccordionsWrapper>
                     <FilterAccordion
-                        items={SidebarFilterData.categories}
-
-                        changeFilter={(id) => handleChangeCategory(id)}
+                        toggleAccordion={() => toggleAccordion(1)}
+                        index={1}
+                        activeAccordion={activeAccordion}
+                        headerTitle={'Бренды'}
+                        items={Brands}
+                        selectedItems={filter.brands}
+                        toggleItem={(brand) => toggleBrand(brand)}
                     />
-                    {/*<FilterAccordion items={SidebarFilterData.brands} changeFilter={(id) => handleChangeBrand(id)}/>*/}
-                    {/*<FilterAccordion items={SidebarFilterData.colors} changeFilter={(id) => handleChangeColor(id)}/>*/}
+                    <FilterAccordion
+                        toggleAccordion={() => toggleAccordion(2)}
+                        index={2}
+                        activeAccordion={activeAccordion}
+                        headerTitle={'Обувь'}
+                        items={Types}
+                        selectedItems={filter.types}
+                        toggleItem={(type) => toggleType(type)}
+                    />
+                    <FilterAccordion
+                        toggleAccordion={() => toggleAccordion(3)}
+                        index={3}
+                        activeAccordion={activeAccordion}
+                        headerTitle={'Цвета'}
+                        items={Colors}
+                        selectedItems={filter.colors}
+                        toggleItem={(color) => toggleColor(color)}
+                    />
                 </AccordionsWrapper>
             </div>
         </div>
